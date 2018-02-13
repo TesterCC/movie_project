@@ -6,3 +6,8 @@
 
 ## Environment
 * Python 3.6 + Flask + 3rd party libs, etc.
+
+## Structure Analysis of Project
+
+
+
