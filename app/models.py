@@ -29,7 +29,7 @@ class User(db.Model):
     face = db.Column(db.String(255), unique=True)  # 头像
     addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 注册时间
     uuid = db.Column(db.String(255), unique=True)  # 唯一标志符
-    
+
     userlogs = db.relationship('Userlog', backref='user')  # 会员日志外键关系关联
     # backref是反向引用，User和Userlog是一对多的关系，backref是表示在Userlog中新建一个属性user，关联的是Userlog中user_id外键关联的User对象。
     comments = db.relationship('Comment', backref='user')  # 评论外键关系关联
