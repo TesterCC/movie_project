@@ -29,9 +29,11 @@ class User(db.Model):
     face = db.Column(db.String(255), unique=True)  # 头像
     addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 注册时间
     uuid = db.Column(db.String(255), unique=True)  # 唯一标志符
+    
     userlogs = db.relationship('Userlog', backref='user')  # 会员日志外键关系关联
     # backref是反向引用，User和Userlog是一对多的关系，backref是表示在Userlog中新建一个属性user，关联的是Userlog中user_id外键关联的User对象。
     comments = db.relationship('Comment', backref='user')  # 评论外键关系关联
+    moviecols = db.relationship('Moviecol', backref='user')  # 电影收藏外键关系关联
 
     def __repr__(self):
         return "<User %r>" % self.name
@@ -60,8 +62,7 @@ class Tag(db.Model):
     name = db.Column(db.String(100), unique=True)  # 标题
     addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 添加时间
     movies = db.relationship("Movie", backref="tag")  # 电影外键关系关联
-
-    # backref是反向引用，Movie和Tag是一对多的关系，backref是表示在Movie中新建一个属性tag，关联的是Movie中tag_id外键关联的Tag对象。
+    # backref是反向引用，Movie和Tag是一对多的关系，backref是表示在Movie中每一个Movie都可以通过tag找到这个User movies，关联的是Movie中tag_id外键关联的Tag对象。
 
     def __repr__(self):
         return "<Tag %r>" % self.name
@@ -83,6 +84,7 @@ class Movie(db.Model):
     length = db.Column(db.String(100))  # 播放时间
     addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 添加时间
     comments = db.relationship("Comment", backref="movie")  # 评论外键关系关联
+    moviecols = db.relationship("Moviecol", backref="movie")   # 电影收藏外键关系关联
 
     def __repr__(self):
         return "<Movie %r>" % self.title
@@ -116,7 +118,47 @@ class Comment(db.Model):
 
 class Moviecol(db.Model):
     """
-    评论
+    电影收藏
     """
+    __tablename__ = "moviecol"
+    id = db.Column(db.Integer, primary_key=True)   # 编号
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'))   # 所属电影  外键通常是父表的主键
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))     # 所属用户
+    addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 添加时间
+
+    def __repr__(self):
+        return "<Moviecol %r>" % self.id
+
+
+class Auth(db.Model):
+    """
+    权限
+    """
+    __tablename__ = "auth"
+    id = db.Column(db.Integer, primary_key=True)    # 编号
+    name = db.Column(db.String(100), unique=True)   # 名称
+    url = db.Column(db.String(255), unique=True)    # 地址
+    addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 添加时间
+
+    def __repr__(self):
+        return "<Auth %r>" % self.name
+
+
+class Role(db.Model):
+    """
+    角色
+    """
+    __tablename__ = "role"
+    id = db.Column(db.Integer, primary_key=True)  # 编号
+    name = db.Column(db.String(100), unique=True)  # 名称
+    auths = db.Column(db.String(600))   # 权限列表
+    addtime = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # 添加时间
+    # admins = db.relationship("Admin", backref='role')  # 管理员外键关系关联
+
+    def __repr__(self):
+        return "<Role %r>" % self.name
+
+
+
 
 
